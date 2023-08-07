@@ -7,13 +7,18 @@ with the SAM CLI. It includes the following files and folders.
 - events - Invocation events that you can use to invoke the function.
 - template.yaml - A template that defines the application's AWS resources.
 
-## Pre-requirements
+## Prerequisites
 
 You will need to install
 - aws-cli - [How to install and configure aws cli](https://cjrequena.com/markdowns/docs/aws/aws-cli)
 - aws-sam-cli
 
-Also you will need to configure aws credentials for aws-cli.
+Also you will need to configure aws credentials for aws-cli and also assign the permission on AWS IAM.
+
+Verify that you have completed the following:
+
+- [AWS SAM prerequisites](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/prerequisites.html)      
+- [Installing the AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html)
 
 ## To build and deploy your application for the first time, run the following in your shell:
 
