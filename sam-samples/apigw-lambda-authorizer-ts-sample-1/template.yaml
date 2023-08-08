@@ -1,0 +1,86 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  apigw-lambda-authorizer-ts-sample-1
+
+  Sample SAM Template for apigw-lambda-authorizer-ts-sample-1
+  
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 3
+    CodeUri: app/
+
+Resources:
+  #---------------------------------------------------------------------------------------------------------------------
+  MyApiGW:
+    Type: AWS::Serverless::Api # https://github.com/aws/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessapi
+    Properties:
+      StageName: dev
+      Auth:
+        DefaultAuthorizer: MyLambdaAuthorizer
+        Authorizers:
+          MyLambdaAuthorizer:
+            FunctionArn: !GetAtt MyAuthorizerFunction.Arn
+  #---------------------------------------------------------------------------------------------------------------------
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      Handler: src/functions/hello-app.lambdaHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      Events:
+        HelloWorld:
+          Type: Api # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            RestApiId: !Ref MyApiGW
+            Path: /hello
+            Method: get
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: false
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints: 
+        - src/functions/hello-app.ts
+  #---------------------------------------------------------------------------------------------------------------------
+  MyAuthorizerFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: src/functions/authorizer.lambdaHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: false
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints:
+          - src/functions/authorizer.ts
+#-----------------------------------------------------------------------------------------------------------------------
+Outputs:
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  Region:
+    Description: "Region"
+    Value: !Ref AWS::Region
+
+  ApiId:
+    Description: "API ID"
+    Value: !Ref MyApiGW
+
+  HelloWorldFunction:
+    Description: "Hello World Lambda Function ARN"
+    Value: !GetAtt HelloWorldFunction.Arn
+
+  HelloWorldFunctionIamRole:
+    Description: "Implicit IAM Role created for Hello World function"
+    Value: !GetAtt HelloWorldFunctionRole.Arn
+
+  HelloWorldApi:
+    Description: "API Gateway endpoint URL for DEV stage for Hello World function"
+    Value: !Sub "https://${MyApiGW}.execute-api.${AWS::Region}.amazonaws.com/dev/hello/"
