@@ -70,7 +70,7 @@ $ npm run test
 To delete the sample application that you created, use the AWS CLI. Assuming you used your project name for the stack name, you can run the following:
 
 ```bash
-aws cloudformation delete-stack --stack-name {stack-name}
+sam delete --stack-name hello-world-ts-sample-2
 ```
 
 ## Resources
