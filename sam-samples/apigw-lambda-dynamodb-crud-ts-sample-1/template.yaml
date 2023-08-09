@@ -8,8 +8,17 @@ Description: >
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
-    Timeout: 3
     CodeUri: app/
+    Timeout: 9
+    Tracing: Active
+    Runtime: nodejs18.x
+    Architectures:
+      - x86_64
+    Environment:
+      Variables:
+        TABLE_NAME: !Ref ProductTable
+  Api:
+    TracingEnabled: True
 # ----------------------------------------------------------------------------------------------------------------------
 Resources:
   #---------------------------------------------------------------------------------------------------------------------
@@ -22,9 +31,6 @@ Resources:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       Handler: src/functions/product-create.handler
-      Runtime: nodejs18.x
-      Architectures:
-        - x86_64
       Events:
         CreateProduct:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
@@ -32,6 +38,9 @@ Resources:
             RestApiId: !Ref MyApiGW
             Path: /products
             Method: post
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ProductTable
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
@@ -46,9 +55,6 @@ Resources:
     Properties:
       #Handler: src/functions/product.retrieve.function.handler
       Handler: src/functions/product-retrieve.handler
-      Runtime: nodejs18.x
-      Architectures:
-        - x86_64
       Events:
         RetrieveAll:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
@@ -62,6 +68,9 @@ Resources:
             RestApiId: !Ref MyApiGW
             Path: /products/{id}
             Method: get
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ProductTable
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
@@ -75,9 +84,6 @@ Resources:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       Handler: src/functions/product-update.handler
-      Runtime: nodejs18.x
-      Architectures:
-        - x86_64
       Events:
         UpdateProduct:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
@@ -85,6 +91,9 @@ Resources:
             RestApiId: !Ref MyApiGW
             Path: /products/{id}
             Method: put
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ProductTable
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
@@ -98,9 +107,6 @@ Resources:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       Handler: src/functions/product-delete.handler
-      Runtime: nodejs18.x
-      Architectures:
-        - x86_64
       Events:
         DeleteProduct:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
@@ -108,6 +114,9 @@ Resources:
             RestApiId: !Ref MyApiGW
             Path: /products/{id}
             Method: delete
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ProductTable
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
@@ -116,6 +125,18 @@ Resources:
         Sourcemap: true
         EntryPoints:
           - src/functions/product-delete.ts
+  # --------------------------------------------------------------------------------------------------------------------
+  ProductTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub ${AWS::StackName}-products
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
 # ----------------------------------------------------------------------------------------------------------------------
 Outputs:
   # Find out more about other implicit resources you can reference within SAM

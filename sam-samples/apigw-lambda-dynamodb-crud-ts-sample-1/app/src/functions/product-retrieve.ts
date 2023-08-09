@@ -35,7 +35,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
           }),
         };
         break;
-      default:
+          default:
         throw new Error(`Unsupported route: "${routeKey}"`);
     }
   } catch (err) {
