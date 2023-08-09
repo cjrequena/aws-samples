@@ -27,39 +27,6 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
           }),
         };
         break;
-      case "GET /products/{id}":
-        return {
-          statusCode: 200,
-          body: JSON.stringify({
-            message: "CALLED RETRIEVE BY ID",
-          }),
-        };
-        break;
-      case "GET /products":
-        return {
-          statusCode: 200,
-          body: JSON.stringify({
-            message: "CALLED RETRIEVE ALL",
-          }),
-        };
-        break;
-      case "DELETE /products/{id}":
-        return {
-          statusCode: 200,
-          body: JSON.stringify({
-            message: "CALLED DELETE",
-          }),
-        };
-        break;
-
-      case "PUT /products/{id}":
-        return {
-          statusCode: 200,
-          body: JSON.stringify({
-            message: "CALLED UPDATE",
-          }),
-        };
-        break;
       default:
         throw new Error(`Unsupported route: "${routeKey}"`);
     }

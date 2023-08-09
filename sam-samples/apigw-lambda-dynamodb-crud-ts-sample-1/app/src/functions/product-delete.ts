@@ -19,44 +19,11 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
   try {
     switch (routeKey) {
-      case "POST /products":
-        return {
-          statusCode: 200,
-          body: JSON.stringify({
-            message: "CALLED CREATE",
-          }),
-        };
-        break;
-      case "GET /products/{id}":
-        return {
-          statusCode: 200,
-          body: JSON.stringify({
-            message: "CALLED RETRIEVE BY ID",
-          }),
-        };
-        break;
-      case "GET /products":
-        return {
-          statusCode: 200,
-          body: JSON.stringify({
-            message: "CALLED RETRIEVE ALL",
-          }),
-        };
-        break;
       case "DELETE /products/{id}":
         return {
           statusCode: 200,
           body: JSON.stringify({
             message: "CALLED DELETE",
-          }),
-        };
-        break;
-
-      case "PUT /products/{id}":
-        return {
-          statusCode: 200,
-          body: JSON.stringify({
-            message: "CALLED UPDATE",
           }),
         };
         break;
