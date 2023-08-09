@@ -1,4 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import { ProductService } from "../services/product-service";
+import { Product } from "../models/product";
 
 /**
  *
@@ -10,8 +12,9 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
  *
  */
 
-export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-
+export const handler = async (
+  event: APIGatewayProxyEvent
+): Promise<APIGatewayProxyResult> => {
   const routeKey: string = `${event.requestContext.httpMethod} ${event.requestContext.resourcePath}`;
 
   console.log("event:", JSON.stringify(event, undefined, 2));
@@ -28,14 +31,15 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
         };
         break;
       case "GET /products":
+        const products = await ProductService.getProducts();
         return {
           statusCode: 200,
           body: JSON.stringify({
-            message: "CALLED RETRIEVE ALL",
+            items: products,
           }),
         };
         break;
-          default:
+      default:
         throw new Error(`Unsupported route: "${routeKey}"`);
     }
   } catch (err) {
