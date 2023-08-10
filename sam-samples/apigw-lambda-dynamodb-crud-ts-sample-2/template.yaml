@@ -1,0 +1,88 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  apigw-lambda-dynamodb-crud-ts-sample-2
+
+  Sample SAM Template for apigw-lambda-dynamodb-crud-ts-sample-2
+  
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    CodeUri: app/
+    Timeout: 9
+    Tracing: Active
+    Runtime: nodejs18.x
+    Architectures:
+      - x86_64
+    Environment:
+      Variables:
+        TABLE_NAME: !Ref ProductTable
+  Api:
+    TracingEnabled: True
+# ----------------------------------------------------------------------------------------------------------------------
+Resources:
+  #---------------------------------------------------------------------------------------------------------------------
+  MyApiGW:
+    Type: AWS::Serverless::Api # https://github.com/aws/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessapi
+    Properties:
+      StageName: dev
+      OpenApiVersion: '2.0'
+      Description: API supporting the application
+      Cors:
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        AllowMethods: "'DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT'"
+        AllowOrigin: "'*'"
+  # --------------------------------------------------------------------------------------------------------------------
+  ProductCrudFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      Handler: src/functions/product-crud.lambdaHandler
+      Events:
+        RetrieveAll:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            RestApiId: !Ref MyApiGW
+            Path: /products
+            Method: get
+        RetrieveById:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            RestApiId: !Ref MyApiGW
+            Path: /products/{id}
+            Method: get
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ProductTable
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: false
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints:
+          - src/functions/product-crud.ts
+  # --------------------------------------------------------------------------------------------------------------------
+  ProductTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub ${AWS::StackName}-products
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+# ----------------------------------------------------------------------------------------------------------------------
+Outputs:
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  Api:
+    Description: "API Gateway endpoint URL for dev stage for product retrieve function"
+    Value: !Sub "https://${MyApiGW}.execute-api.${AWS::Region}.amazonaws.com/dev/products/"
+  ProductCrudFunction:
+    Description: "ProductCrudFunction ARN"
+    Value: !GetAtt ProductCrudFunction.Arn
+  ProductCrudFunctionIamRole:
+    Description: "Implicit IAM Role created for ProductCrudFunction function"
+    Value: !GetAtt ProductCrudFunctionRole.Arn
