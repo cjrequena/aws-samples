@@ -1,4 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import { ProductService } from "../services/product-service";
+import { Product } from "../models/product";
 
 /**
  *
@@ -10,33 +12,23 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
  *
  */
 
-export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-
-  const routeKey: string = `${event.requestContext.httpMethod} ${event.requestContext.resourcePath}`;
-
+export const handler = async (
+  event: APIGatewayProxyEvent
+): Promise<APIGatewayProxyResult> => {
   console.log("event:", JSON.stringify(event, undefined, 2));
-  console.log(`routeKey: ${routeKey}`);
-
-  try {
-    switch (routeKey) {
-      case "PUT /products/{id}":
-        return {
-          statusCode: 200,
-          body: JSON.stringify({
-            message: "CALLED UPDATE",
-          }),
-        };
-        break;
-      default:
-        throw new Error(`Unsupported route: "${routeKey}"`);
-    }
-  } catch (err) {
-    console.log(err);
+  const id = event.pathParameters?.id;
+  if (!id) {
     return {
-      statusCode: 500,
+      statusCode: 400,
       body: JSON.stringify({
-        message: "some error happened",
+        message: "id is required",
       }),
     };
   }
+  const updatedProduct: Product = JSON.parse(event.body as string);
+  const product = await ProductService.updateProductById(id, updatedProduct);
+  return {
+    statusCode: 200,
+    body: JSON.stringify(product)
+  };
 };

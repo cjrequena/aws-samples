@@ -12,31 +12,34 @@ import { Product } from "../models/product";
  *
  */
 
-export const handler = async (
-  event: APIGatewayProxyEvent
-): Promise<APIGatewayProxyResult> => {
-  const routeKey: string = `${event.requestContext.httpMethod} ${event.requestContext.resourcePath}`;
+export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
 
+  const routeKey: string = `${event.requestContext.httpMethod} ${event.requestContext.resourcePath}`;
   console.log("event:", JSON.stringify(event, undefined, 2));
   console.log(`routeKey: ${routeKey}`);
 
   try {
     switch (routeKey) {
       case "GET /products/{id}":
+        const id = event.pathParameters?.id;
+        if (!id) {
+          return {
+            statusCode: 400,
+            body: JSON.stringify({
+              message: "id is required",
+            }),
+          };
+        }
+        const product = await ProductService.getProductById(id);
         return {
           statusCode: 200,
-          body: JSON.stringify({
-            message: "CALLED RETRIEVE BY ID",
-          }),
+          body: JSON.stringify(product)
         };
-        break;
       case "GET /products":
         const products = await ProductService.getProducts();
         return {
           statusCode: 200,
-          body: JSON.stringify({
-            items: products,
-          }),
+          body: JSON.stringify(products)
         };
         break;
       default:

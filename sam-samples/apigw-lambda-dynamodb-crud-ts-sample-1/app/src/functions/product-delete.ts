@@ -1,5 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-
+import { ProductService } from "../services/product-service";
+import { Product } from "../models/product";
 /**
  *
  * Event doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
@@ -11,32 +12,19 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
  */
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-
-  const routeKey: string = `${event.requestContext.httpMethod} ${event.requestContext.resourcePath}`;
-
   console.log("event:", JSON.stringify(event, undefined, 2));
-  console.log(`routeKey: ${routeKey}`);
-
-  try {
-    switch (routeKey) {
-      case "DELETE /products/{id}":
-        return {
-          statusCode: 200,
-          body: JSON.stringify({
-            message: "CALLED DELETE",
-          }),
-        };
-        break;
-      default:
-        throw new Error(`Unsupported route: "${routeKey}"`);
-    }
-  } catch (err) {
-    console.log(err);
+  const id = event.pathParameters?.id;
+  if (!id) {
     return {
-      statusCode: 500,
+      statusCode: 400,
       body: JSON.stringify({
-        message: "some error happened",
+        message: "id is required",
       }),
     };
   }
+  await ProductService.deleteProductById(id);
+  return {
+    statusCode: 204,
+    body: "Product deleted",
+  };
 };
