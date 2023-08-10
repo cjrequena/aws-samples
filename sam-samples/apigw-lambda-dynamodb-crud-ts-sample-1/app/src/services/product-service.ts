@@ -22,7 +22,7 @@ export class ProductService {
     try {
       return await ProductRepository.getProductById(id);
     } catch (error) {
-      throw new Error("Error getting product by id: " + error);
+      throw new Error("Service error getting product by id: " + error);
     }
   }
 
@@ -34,7 +34,7 @@ export class ProductService {
       product.id = id;
       return await ProductRepository.updateProductById(product);
     } catch (error) {
-      throw new Error("Error updating product: " + error);
+      throw new Error("Service error updating product: " + error);
     }
   }
 
@@ -42,7 +42,7 @@ export class ProductService {
     try {
       await ProductRepository.deleteProductById(id);
     } catch (error) {
-      throw new Error("Error deleting product: " + error);
+      throw new Error("Service error deleting product: " + error);
     }
   }
 }

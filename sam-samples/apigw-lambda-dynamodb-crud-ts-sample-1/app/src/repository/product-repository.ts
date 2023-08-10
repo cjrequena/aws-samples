@@ -31,7 +31,7 @@ export class ProductRepository {
 
       return response.Items as Product[];
     } catch (error) {
-      throw new Error("Error getting products: " + error);
+      throw new Error("Repository error getting products: " + error);
     }
   }
 
@@ -48,7 +48,7 @@ export class ProductRepository {
         .promise();
       return response.Item as Product;
     } catch (error) {
-      throw new Error("Error getting product by id: " + error);
+      throw new Error("Repository error getting product by id: " + error);
     }
   }
 
@@ -77,7 +77,7 @@ export class ProductRepository {
         .promise();
       return product;
     } catch (error) {
-      throw new Error("Error updating product: " + error);
+      throw new Error("Repository error updating product: " + error);
     }
   }
 
@@ -93,7 +93,7 @@ export class ProductRepository {
         })
         .promise();
     } catch (error) {
-      throw new Error("Error deleting product: " + error);
+      throw new Error("Repository error deleting product: " + error);
     }
   }
 }
