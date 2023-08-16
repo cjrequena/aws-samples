@@ -41,13 +41,13 @@ Resources:
         RootApi:
           Type: Api
           Properties:
-            Path: /blogposts
+            Path: /products
             Method: ANY
             RestApiId: !Ref MyApiGW
         WildcardApi:
           Type: Api
           Properties:
-            Path: /blogposts/{proxy+}
+            Path: /products/{id}
             Method: ANY
             RestApiId: !Ref MyApiGW
       Policies:
