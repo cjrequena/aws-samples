@@ -38,18 +38,18 @@ Resources:
     Properties:
       Handler: src/functions/product-crud.lambdaHandler
       Events:
-        RetrieveAll:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+        RootApi:
+          Type: Api
           Properties:
+            Path: /blogposts
+            Method: ANY
             RestApiId: !Ref MyApiGW
-            Path: /products
-            Method: get
-        RetrieveById:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+        WildcardApi:
+          Type: Api
           Properties:
+            Path: /blogposts/{proxy+}
+            Method: ANY
             RestApiId: !Ref MyApiGW
-            Path: /products/{id}
-            Method: get
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref ProductTable
